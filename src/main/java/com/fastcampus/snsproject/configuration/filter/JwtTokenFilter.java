@@ -9,11 +9,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,21 +40,16 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         try{
             final String token = header.split(" ")[1].trim();
 
-            // TODO: check token is valid
             if(JwtTokenUtils.isExpired(token, key)){
                 log.error("Key is expired");
                 filterChain.doFilter(request,response);
                 return;
             }
 
-            // TODO: username valid check
             String userName = JwtTokenUtils.getUserName(token,key);
 
-
-            //TODO: check the user is valid
             User user = userService.loadUserByUserName(userName);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    //TODO
                     user, null , List.of(new SimpleGrantedAuthority(user.getUserRole().toString()))
             );
 
